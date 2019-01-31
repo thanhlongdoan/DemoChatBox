@@ -1,0 +1,66 @@
+﻿
+@{
+    ViewBag.Title = "Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section css{
+    <link href="~/Content/manager-chat.css" rel="stylesheet" />
+}
+<div class="messaging row w-100 mx-auto">
+    <div class="inbox_msg col-md-6 mx-auto">
+        <div class="mesgs box-chat">
+            <div class="msg_history">
+            </div>
+            <div class="type_msg">
+                <div class="input_msg_write">
+                    <input type="text" class="write_msg" id="msg" placeholder="Type a message" />
+                    <button class="msg_send_btn" id="btnSend" type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/jquery.signalR-2.2.2.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+        $(function () {
+            var myHub = $.connection.chatHub;
+            myHub.client.sendAll = function (id, msg) {
+                var textMsg = $('<div />').text(msg).html();
+                var idConnec = $.connection.hub.id;
+                if (idConnec == id)
+                    $('.msg_history').append('<div class="outgoing_msg"><div class="sent_msg"><p>' + textMsg + '</p><span class="time_date"> 11:01 AM | June 9</span> </div></div>');
+            }
+            //gui tin nhan rieng
+            myHub.client.sendPrivate = function (id, msg, idreturn) {
+                var textMsg2 = $('<div />').text(msg).html();
+                var idConnec = $.connection.hub.id;
+                if (idConnec == idreturn) {
+                    $('.msg_history').append('<div class="outgoing_msg"><div class="sent_msg"><p>' + textMsg2 + '</p><span class="time_date"> 11:01 AM | June 9</span> </div></div>');
+                }
+                else {
+                    $('.msg_history').append('<div class="incoming_msg"><div class="received_msg"><div class="received_withd_msg"><p>' + textMsg2 + ' </p><span class="time_date"> 11:01 AM | June 9</span></div></div></div>');
+                }
+            }
+            $.connection.hub.start().done(function () {
+                var input = document.getElementById("msg");
+                input.addEventListener("keyup", function (event) {
+                    if (event.keyCode == 13) {
+                        myHub.server.sendMsg($('#msg').val())
+                        $('#msg').val('').focus();
+                    }
+                });
+                $('.input_msg_write').on('click', '#btnSend', function () {
+                    myHub.server.sendMsg($('#msg').val())
+                    $('#msg').val('').focus();
+                })
+            });
+            //$.connection.hub.stop(function () {
+            //    chat.server.onDisconnected(true)
+            //});
+        })
+    </script>
+}
+
