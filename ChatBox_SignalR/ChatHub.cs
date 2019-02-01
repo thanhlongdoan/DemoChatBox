@@ -12,10 +12,28 @@ namespace ChatBox_SignalR
         public void SendMsg(string msg)
         {
             var id = Context.ConnectionId;
-            if (listUser.Count(x => x.ConnectionId == id) == 0)
+            if (listUser.Count == 0)
             {
-                listUser.Add(new User { ConnectionId = id });
+                listUser.Add(new User { ConnectionId = id, Msg = msg });
             }
+            else
+            {
+                bool check = false;
+                for (int i = 0; i < listUser.Count; i++)
+                {
+                    if (listUser[i].ConnectionId == id)
+                    {
+                        check = true;
+                        listUser[i].Msg = msg;
+                    }
+
+                }
+                if (check == false)
+                {
+                    listUser.Add(new User { ConnectionId = id, Msg = msg });
+                }
+            }
+
             var name = Context.Request.User.Identity.Name;
             //gui tin nhan cho admin
             Clients.User("admin@gmail.com").Send(id, msg, listUser);
@@ -44,7 +62,7 @@ namespace ChatBox_SignalR
         {
             //id cua ket noi hien hanh
             var idReturn = Context.ConnectionId;
-            Clients.Client(id).SendPrivate(id, msg, idReturn);
+            Clients.Clients(new List<string> { id, idReturn }).SendPrivate(id, msg, idReturn);
         }
     }
 }

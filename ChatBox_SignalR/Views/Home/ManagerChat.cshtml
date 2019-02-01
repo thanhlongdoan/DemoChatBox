@@ -22,35 +22,6 @@
             </div>
         </div>
         <div class="mesgs">
-            @*<div class="msg_history">
-                    <div class="incoming_msg">
-                        <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                        <div class="received_msg">
-                            <div class="received_withd_msg">
-                                <p>
-                                    Test which is a new approach to have all
-                                    solutions
-                                </p>
-                                <span class="time_date"> 11:01 AM    |    June 9</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="outgoing_msg">
-                        <div class="sent_msg">
-                            <p>
-                                Test which is a new approach to have all
-                                solutions
-                            </p>
-                            <span class="time_date"> 11:01 AM    |    June 9</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="type_msg">
-                    <div class="input_msg_write">
-                        <input type="text" class="write_msg" placeholder="Type a message" />
-                        <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
-                    </div>
-                </div>*@
         </div>
     </div>
 </div>
@@ -60,32 +31,33 @@
     <script>
         $(function () {
             var chat = $.connection.chatHub;
-            //remove user disconnec
-            //chat.client.onUserDisConnected = function (id, connectionIdDisConnec) {
-            //    console.log('remove: ' + connectionIdDisConnec)
-            //}
             chat.client.send = function (id, msg, listUser) {
-                var textId = $('<div />').text(id).html();
-                var textMsg = $('<div />').text(msg).html();
-                $('.chat_people').append('<div class="chat_img"></div><div class= "chat_ib" id=' + textId + '><h5> ' + textId + ' <span class= "chat_date"> Dec 25</span></h5 > <p>' + textMsg + '</p> </div>');
+                $('.chat_people').html('');
+                for (var i = 0; i < listUser.length; i++) {
+                    console.log('msg' + listUser[i].ConnectionId + ':' + listUser[i].Msg)
+                    var idAdd = listUser[i].ConnectionId;
+                    $('.chat_people').append('<div class="chat_img"></div><div class= "chat_ib" id=' + idAdd + '><h5> ' + idAdd + ' <span class= "chat_date"> Dec 25</span></h5 > <p> ' + listUser[i].Msg + '</p> </div>');
+
+                }
+
                 //append tin nhan gui di tu admin cho client
                 var idConnec = $.connection.hub.id;
-                console.log(idConnec + id)
                 if (idConnec == id) {
-                    $('.msg_history').append('<div class="outgoing_msg"><div class="sent_msg"><p>' + textMsg + '</p><span class="time_date"> 11:01 AM | June 9</span> </div></div>');
+                    $('.msg_history').append('<div class="outgoing_msg"><div class="sent_msg"><p>' + msg + '</p><span class="time_date"> 11:01 AM | June 9</span> </div></div>');
                 }
                 else {
 
-                    var code = '<div class="incoming_msg"><div class="received_msg"><div class="received_withd_msg"><p>' + textMsg + ' </p><span class="time_date"> 11:01 AM | June 9</span></div></div></div>';
-                    console.log(code);
+                    var code = '<div class="incoming_msg"><div class="received_msg"><div class="received_withd_msg"><p>' + msg + ' </p><span class="time_date"> 11:01 AM | June 9</span></div></div></div>';
                     var code = $('.msg_history').append(code);
                 }
             }
-
+            chat.client.sendPrivate = function (id, msg, idreturn) {
+                var textMsg = $('<div />').text(msg).html();
+                $('.msg_history').append('<div class="outgoing_msg"><div class="sent_msg"><p>' + textMsg + '</p><span class="time_date"> 11:01 AM | June 9</span> </div></div>');
+            }
             $.connection.hub.start().done(function () {
                 //gui tin nhan rieng
                 $('.chat_people').on('dblclick', '.chat_ib', function () {
-                    console.log($(this).attr('id'))
                     var id = $(this).attr('id');
                     var textGui = $('#' + id + '' + ' p').text();
                     var txt = addMsgAdmin(textGui);
@@ -93,13 +65,11 @@
                     var input = document.getElementById("msg");
                     input.addEventListener("keyup", function (event) {
                         if (event.keyCode == 13) {
-                            console.log($('#msg').val())
                             chat.server.sendMsgPrivate(id, $('#msg').val());
                             $('#msg').val('').focus();
                         }
                     });
                     $('.input_msg_write').on('click', '#btnSend', function () {
-                        console.log($('#msg').val())
                         chat.server.sendMsgPrivate(id, $('#msg').val());
                         $('#msg').val('').focus();
                     })
