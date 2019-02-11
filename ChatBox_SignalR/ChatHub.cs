@@ -17,13 +17,6 @@ namespace ChatBox_SignalR
             var id = Context.ConnectionId;
             List<string> list = new List<string>();
             list.Add(msg);
-            var Data = new UserDb
-            {
-                User = id
-            };
-            db.userDbs.Add(Data);
-            db.SaveChanges();
-            string listA = new JavaScriptSerializer().Serialize(db.userDbs.ToList());
             if (listUser.Count == 0)
             {
                 listUser.Add(
@@ -56,7 +49,6 @@ namespace ChatBox_SignalR
             string listUserJson = new JavaScriptSerializer().Serialize(listUser);
             Clients.User("admin@gmail.com").Send(id, msg, listUserJson);
             Clients.All.SendAll(id, msg);
-            Clients.User("admin@gmail.com").SendList(listA);
         }
         public override Task OnDisconnected(bool stopCalled)
         {

@@ -59,9 +59,6 @@
                 var textMsg = $('<div />').text(msg).html();
                 $('.msg_history').append('<div class="outgoing_msg"><div class="sent_msg"><p>' + textMsg + '</p><span class="time_date"> 11:01 AM | June 9</span> </div></div>');
             }
-            chat.client.sendList = function (list) {
-                console.log(list + '---')
-            }
             $.connection.hub.start().done(function () {
                 //gui tin nhan rieng
                 $('.chat_people').on('dblclick', '.chat_ib', function () {
