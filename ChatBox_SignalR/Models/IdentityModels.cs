@@ -1,8 +1,8 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace ChatBox_SignalR.Models
 {
@@ -24,6 +24,7 @@ namespace ChatBox_SignalR.Models
             : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
+        public DbSet<UserDb> userDbs { get; set; }
 
         public static ApplicationDbContext Create()
         {

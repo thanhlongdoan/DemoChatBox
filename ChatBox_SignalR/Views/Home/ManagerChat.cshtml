@@ -33,10 +33,14 @@
             var chat = $.connection.chatHub;
             chat.client.send = function (id, msg, listUser) {
                 $('.chat_people').html('');
-                for (var i = 0; i < listUser.length; i++) {
-                    console.log('msg' + listUser[i].ConnectionId + ':' + listUser[i].Msg)
-                    var idAdd = listUser[i].ConnectionId;
-                    $('.chat_people').append('<div class="chat_img"></div><div class= "chat_ib" id=' + idAdd + '><h5> ' + idAdd + ' <span class= "chat_date"> Dec 25</span></h5 > <p> ' + listUser[i].Msg + '</p> </div>');
+                var jsonData = JSON.parse(listUser);
+                console.log(jsonData);
+                for (var i = 0; i < jsonData.length; i++) {
+                    console.log('msg' + jsonData[i].ConnectionId + ':' + jsonData[i].Msg)
+                    var idAdd = jsonData[i].ConnectionId;
+                    var lengthMsg = jsonData[i].Msg.length;
+                    console.log(lengthMsg);
+                    $('.chat_people').append('<div class="chat_img"></div><div class= "chat_ib" id=' + idAdd + '><h5> ' + idAdd + ' <span class= "chat_date"> Dec 25</span></h5 > <p> ' + jsonData[i].Msg + '</p> </div>');
 
                 }
 
@@ -54,6 +58,9 @@
             chat.client.sendPrivate = function (id, msg, idreturn) {
                 var textMsg = $('<div />').text(msg).html();
                 $('.msg_history').append('<div class="outgoing_msg"><div class="sent_msg"><p>' + textMsg + '</p><span class="time_date"> 11:01 AM | June 9</span> </div></div>');
+            }
+            chat.client.sendList = function (list) {
+                console.log(list + '---')
             }
             $.connection.hub.start().done(function () {
                 //gui tin nhan rieng

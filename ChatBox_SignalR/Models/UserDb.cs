@@ -5,9 +5,9 @@ using System.Web;
 
 namespace ChatBox_SignalR.Models
 {
-    public class User
+    public class UserDb
     {
-        public string ConnectionId { get; set; }
-        public List<string> Msg { get; set; }
+        public int Id { get; set; }
+        public string User { get; set; }
     }
 }

@@ -1,20 +1,38 @@
 ﻿using ChatBox_SignalR.Models;
 using Microsoft.AspNet.SignalR;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace ChatBox_SignalR
 {
     public class ChatHub : Hub
     {
+        private ApplicationDbContext db = new ApplicationDbContext();
         static List<User> listUser = new List<User>();
         public void SendMsg(string msg)
         {
             var id = Context.ConnectionId;
+            List<string> list = new List<string>();
+            list.Add(msg);
+            var Data = new UserDb
+            {
+                User = id
+            };
+            db.userDbs.Add(Data);
+            db.SaveChanges();
+            string listA = new JavaScriptSerializer().Serialize(db.userDbs.ToList());
             if (listUser.Count == 0)
             {
-                listUser.Add(new User { ConnectionId = id, Msg = msg });
+                listUser.Add(
+                    new User
+                    {
+                        ConnectionId = id,
+                        Msg = new List<string>() { msg }
+                    }
+                    );
             }
             else
             {
@@ -24,20 +42,21 @@ namespace ChatBox_SignalR
                     if (listUser[i].ConnectionId == id)
                     {
                         check = true;
-                        listUser[i].Msg = msg;
+                        listUser[i].Msg.Add(msg);
                     }
-
                 }
                 if (check == false)
                 {
-                    listUser.Add(new User { ConnectionId = id, Msg = msg });
+                    listUser.Add(new User { ConnectionId = id, Msg = new List<string>() { msg } });
                 }
             }
 
             var name = Context.Request.User.Identity.Name;
             //gui tin nhan cho admin
-            Clients.User("admin@gmail.com").Send(id, msg, listUser);
+            string listUserJson = new JavaScriptSerializer().Serialize(listUser);
+            Clients.User("admin@gmail.com").Send(id, msg, listUserJson);
             Clients.All.SendAll(id, msg);
+            Clients.User("admin@gmail.com").SendList(listA);
         }
         public override Task OnDisconnected(bool stopCalled)
         {
